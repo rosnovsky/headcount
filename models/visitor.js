@@ -11,18 +11,17 @@ const visitorSchema = new Schema({
 		},
 		coordinates: [
 			{
-				type: Number,
-				required: "You must supply coordinates"
+				type: Number
 			}
 		],
 		address: {
-			type: String,
-			required: "Address is required."
+			type: String
 		}
 	},
 	system: String,
 	client: String,
-	version: String
+	version: String,
+	fullHeader: Object
 });
 
 mongoose.model("visitor", visitorSchema);

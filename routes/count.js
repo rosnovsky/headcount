@@ -18,40 +18,25 @@ module.exports = app => {
 		);
 		const { country, region, city, ll, zip } = geoip.lookup(address);
 		const ua = useragent.parse(req.headers["user-agent"]);
-		const obj = {
+
+		const visitor = new Visitor({
 			timestamp: new Date(),
 			ip: address,
 			location: {
-				country,
-				region,
-				city,
-				ll,
-				zip
+				coordinates: [ll[1], ll[0]],
+				address: `${city}, ${region}, ${country}, ${zip}`
 			},
 			system: `${ua.os.family} ${ua.os.major}.${ua.os.minor}.${ua.os.patch}`,
 			client: ua.family,
-			version: ua.major
-		};
-		console.log(obj);
-
-		const visitor = new Visitor({
-			timestamp: obj.timestamp,
-			ip: obj.ip,
-			location: {
-				coordinates: [obj.location.ll[1], obj.location.ll[0]],
-				address: `${obj.location.city}, ${obj.location.region}, ${
-					obj.location.country
-				}, ${obj.location.zip}`
-			},
-			system: obj.system,
-			client: obj.client,
-			version: obj.version
+			version: ua.major,
+			fullHeader: req.headers
 		});
 		try {
 			await visitor.save();
 		} catch (err) {
-			res.status(422).send(err);
+			return res.status(422).send(err);
 		}
-		res.send(obj);
+		console.log(visitor);
+		res.send(visitor);
 	});
 };
